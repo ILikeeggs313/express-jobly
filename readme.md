@@ -29,3 +29,5 @@ third commit:
 
 
 Fourth commit: Adding features for jobs to the application
+
+Fifth commit: since the job routes should have similar functions to the companies route, copy from the companies route and modified the names
