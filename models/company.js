@@ -49,7 +49,7 @@ class Company {
    * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
    * */
 
-  static async findAll() {
+  static async findAll(searchFilters={}) {
     //after some considerations, adding to the findAll function is probably better
     const query = await db.query(
           `SELECT handle,
@@ -89,7 +89,7 @@ class Company {
       query += "WHERE" + Filters.join("AND");
     }
     query += "ORDER BY name";
-    const result = db.query(query, FiltersQuery);
+    const result = await db.query(query, FiltersQuery);
     //did not work, forgot to add a return clause here
     return result.rows;
     

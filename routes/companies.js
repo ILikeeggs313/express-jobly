@@ -25,7 +25,7 @@ const router = new express.Router();
  * Authorization required: login
  */
 
-router.post("/", ensureLoggedIn, async function (req, res, next) {
+router.post("/", ensureAdmin, async function (req, res, next) {
   try {
     //modified this route from ensureLoggedIn to ensureAdmin
     const validator = jsonschema.validate(req.body, companyNewSchema);
@@ -67,7 +67,7 @@ router.get("/", async function (req, res, next) {
       const error = validator.errors.map(e => e.stack);
       throw new BadRequestError(error)
     }
-    const companiesRes = await Company.findByFilter(q);
+    const companiesRes = await Company.findAll(q);
     return res.json( {companiesRes} );
     
   } catch (err) {
