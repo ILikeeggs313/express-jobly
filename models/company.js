@@ -50,7 +50,8 @@ class Company {
    * */
 
   static async findAll() {
-    const companiesRes = await db.query(
+    //after some considerations, adding to the findAll function is probably better
+    const query = await db.query(
           `SELECT handle,
                   name,
                   description,
@@ -58,8 +59,42 @@ class Company {
                   logo_url AS "logoUrl"
            FROM companies
            ORDER BY name`);
-    return companiesRes.rows;
+    //initial testing, {} queryFilters seem to not work, change to []
+    let Filters = [];
+    let FiltersQuery = [];
+    //since we need max and min we can deconstruct them?
+    const {minEmployees, maxEmployees, name} = searchFilters;
+    //since min employees cannot be more than max we throw an error if it is
+    //status code 400?
+    if(minEmployees > maxEmployees){
+      throw new BadRequestError(`Min cannot be bigger than max, please retry`, 400)
+    }
+    //now we can add logic for min max search term
+    if(minEmployees !== undefined){
+      FiltersQuery.push(minEmployees);
+      Filters.push(`num_employees >= $${FiltersQuery.length}`)
+    }
+    if(maxEmployees !== undefined){
+      FiltersQuery.push(maxEmployees);
+      Filters.push(`num_employees <= $${FiltersQuery.length}`)
+    }
+    if(name){
+      //jinjia templates for name or handle?
+      FiltersQuery.push(`%${name}%`);
+      Filters.push(`name ILIKE $${FiltersQuery.length}`);
+    }
+
+    if(Filters.length >0 ){
+      //if there is a query we can join the query 
+      query += "WHERE" + Filters.join("AND");
+    }
+    query += "ORDER BY name";
+    const result = db.query(query, FiltersQuery);
+    //did not work, forgot to add a return clause here
+    return result.rows;
+    
   }
+  
 
   /** Given a company handle, return data about company.
    *
@@ -144,3 +179,37 @@ class Company {
 
 
 module.exports = Company;
+
+// //initial testing, {} queryFilters seem to not work, change to []
+// let Filters = [];
+// let FiltersQuery = [];
+// //since we need max and min we can deconstruct them?
+// const {minEmployees, maxEmployees, name} = searchFilters;
+// //since min employees cannot be more than max we throw an error if it is
+// //status code 400?
+// if(minEmployees > maxEmployees){
+//   throw new BadRequestError(`Min cannot be bigger than max, please retry`, 400)
+// }
+// //now we can add logic for min max search term
+// if(minEmployees !== undefined){
+//   FiltersQuery.push(minEmployees);
+//   Filters.push(`num_employees >= $${FiltersQuery.length}`)
+// }
+// if(maxEmployees !== undefined){
+//   FiltersQuery.push(maxEmployees);
+//   Filters.push(`num_employees <= $${FiltersQuery.length}`)
+// }
+// if(name){
+//   //jinjia templates for name or handle?
+//   FiltersQuery.push(`%${name}%`);
+//   Filters.push(`name ILIKE $${FiltersQuery.length}`);
+// }
+
+// if(Filters.length >0 ){
+//   //if there is a query we can join the query 
+//   query += "WHERE" + Filters.join("AND");
+// }
+// query += "ORDER BY name";
+// const result = db.query(query, FiltersQuery);
+// //did not work, forgot to add a return clause here
+// return result.rows;

@@ -9,3 +9,12 @@ To run this:
 To run the tests:
 
     jest -i
+
+first commit:
+    Added filtering into GET /companies route, can be passed into
+    query tring:
+        name: filter by name, case insensitive
+        minEmployees: minimum numbers of employees.
+        maxEmployees: maximum numbers of employees.
+        if minEmployees > maxEmployees, return 400 bad request.
+
