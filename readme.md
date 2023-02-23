@@ -31,3 +31,14 @@ third commit:
 Fourth commit: Adding features for jobs to the application
 
 Fifth commit: since the job routes should have similar functions to the companies route, copy from the companies route and modified the names
+
+6th commit : job applications
+    Add a route at POST /users/:username/jobs/:id that allows that user to apply for a job (or an admin to do it for them). That route should return JSON like:
+
+    { applied: jobId }
+
+    Change the output of the get-all-info methods and routes for users so those include the a field with a simple list of job IDs the user has applied for:
+
+    { ..., jobs: [ jobId, jobId, ... ] }
+    Document this carefully and write tests.
+
